@@ -80,26 +80,21 @@ class ZoneH:
         for cookie in cookies:
             self._session.cookies.set_cookie(cookie)
 
-    def get_archive(self, page_num=None, single=None, country=None):
+    def get_archive(self, single=None, country=None):
         """TODO"""
-        return self.__get_archive(page_num=page_num, single=single,
-                                  country=country)
+        return self.__get_archive(single=single, country=country)
 
-    def get_archive_special(self, page_num=None, country=None, single=None):
+    def get_archive_special(self, country=None, single=None):
         """TODO"""
-        return self.__get_archive(special=True, page_num=page_num,
-                                  single=single,
-                                  country=country)
+        return self.__get_archive(special=True, single=single, country=country)
 
-    def get_onhold(self, page_num=None, single=None, country=None, start=None,
-                   end=None):
+    def get_onhold(self, single=None, country=None, start=None, end=None):
         """TODO"""
-        return self.__get_archive(onhold=True, single=single,
-                                  page_num=page_num,
-                                  country=country, start=start, end=end)
+        return self.__get_archive(onhold=True, single=single,country=country,
+                                  start=start, end=end)
 
-    def __get_archive(self, page_num=None, single=None, special=False,
-                      onhold=False, country=None, start=None, end=None):
+    def __get_archive(self, single=None, special=False, onhold=False,
+                      country=None, start=None, end=None):
         """TODO"""
         data = {}
         country = COUNTRY_DICT.get(country)
@@ -118,9 +113,9 @@ class ZoneH:
                     raise ZoneHError('Start page can\'t be larger than End page')
                 data = self.__get_pages(start, end, url, country)
             elif single:
-                self._log.info(f'Processing single page: {page_num}')
+                self._log.info(f'Processing single page: {single}')
                 archive = self._make_request(url=url)
-                data[page_num] = self._process_soup(archive, country=country)
+                data[single] = self._process_soup(archive, country=country)
             else:
                 num_of_pages = self._get_pages_count()
                 self._log.info(f'Getting whole archive, number of pages: '
