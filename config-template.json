@@ -1,0 +1,17 @@
+{
+  "telegram": {
+    "token": "",
+    "allowed_user_ids": []
+  },
+  "log_level": "DEBUG",
+  "zoneh": {
+    "archive": "special",
+    "filters": {
+      "countries": [],
+      "domains": [],
+      "notifiers": []
+    },
+    "rescan_period": 1800,
+    "random_ua": true
+  }
+}

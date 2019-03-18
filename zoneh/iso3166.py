@@ -1,4 +1,4 @@
-"""ISO 3166-1 alpha-2 country mapping."""
+"""Modified ISO 3166-1 alpha-2 country mapping."""
 
 COUNTRY_DICT = {'AD': 'Andorra',
                 'AE': 'United Arab Emirates',
@@ -232,7 +232,8 @@ COUNTRY_DICT = {'AD': 'Andorra',
                 'UA': 'Ukraine',
                 'UG': 'Uganda',
                 'UM': 'United States Minor Outlying Islands',
-                'US': 'United States of America',
+                # 'US': 'United States of America',
+                'US': 'United States',
                 'UY': 'Uruguay',
                 'UZ': 'Uzbekistan',
                 'VA': 'Holy See',
