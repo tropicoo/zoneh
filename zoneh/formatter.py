@@ -1,3 +1,5 @@
+"""Formatter module."""
+
 import inspect
 
 from zoneh.const import MIRROR_URL, MASS_DEFACEMENT_URL, REDEFACEMENT_URL

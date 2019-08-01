@@ -1,4 +1,5 @@
 """Zone-H module."""
+
 import csv
 import io
 import logging
@@ -47,7 +48,7 @@ class ZoneHBot(Bot):
         self._log = logging.getLogger(self.__class__.__name__)
         self._user_ids = _CONF['telegram']['allowed_user_ids']
         self._stop_polling = stop_polling
-        self._log.info('Initializing {0} bot'.format(self.first_name))
+        self._log.info('Initializing %s bot', self.first_name)
 
         self._captcha_queue = deque()
         self._pusher_on = Event()
@@ -148,7 +149,7 @@ class ZoneHBot(Bot):
                                                    caption=captcha[1])
                     except IndexError:
                         pass
-                    except Exception as err:
+                    except Exception:
                         self._log.exception('Captcha worker error')
                     shallow_sleep(0.5)
             shallow_sleep(0.5)
@@ -180,7 +181,7 @@ class ZoneHBot(Bot):
 
     def error_handler(self, update, error):
         """Handle known telegram bot API errors."""
-        self._log.exception('Got error: {0}'.format(error))
+        self._log.exception('Got error: %s', error)
 
     def _print_helper(self, update):
         """Send help message."""

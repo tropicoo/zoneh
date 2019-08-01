@@ -1,4 +1,5 @@
 """Scraper module."""
+
 import logging
 import os
 import pickle
@@ -41,7 +42,7 @@ class Scraper:
                 os.stat(self._cookie_file).st_size > 0:
             with open(self._cookie_file, 'rb') as fd:
                 self._session.cookies.update(pickle.load(fd))
-            _LOG.info('Cookies from {0} loaded'.format(self._cookie_file))
+            _LOG.info('Cookies from %s loaded', self._cookie_file)
         else:
             self._set_cookies()
 
@@ -53,7 +54,7 @@ class Scraper:
     def _save_cookies(self):
         with open(self._cookie_file, 'wb') as fd:
             pickle.dump(self._session.cookies, fd)
-        _LOG.info('Cookies saved to {0}'.format(self._cookie_file))
+        _LOG.info('Cookies saved to {0}', self._cookie_file)
 
     def _set_cookies(self):
         preload_page = self._make_request(const.BASE_URL).text
@@ -131,11 +132,11 @@ class Scraper:
     # TODO: Retry decorator
     def _make_request(self, url, method='GET', data=None):
         try:
-            _LOG.debug(f'URL: {url}')
+            _LOG.debug('URL: %s', url)
             if self._random_ua:
                 headers = const.HEADERS
                 headers['User-Agent'] = get_randoma_ua()
-                _LOG.debug(f'Random UA: {headers["User-Agent"]}')
+                _LOG.debug('Random UA: %s', headers['User-Agent'])
                 self._session.headers.update(headers)
 
             res = self._session.request(method, url=url, data=data)

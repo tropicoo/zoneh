@@ -1,4 +1,5 @@
 """Utils module."""
+
 import inspect
 import logging
 import secrets

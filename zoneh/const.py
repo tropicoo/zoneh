@@ -1,3 +1,5 @@
+"""Constants module."""
+
 import os
 import sys
 
