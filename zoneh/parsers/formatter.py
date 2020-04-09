@@ -8,6 +8,10 @@ from zoneh.utils import get_func_name
 
 class Record:
     def __init__(self, record):
+        """Class constructor.
+
+        Represent Zone-H table row as record object.
+        """
         self._record = record
 
     def __repr__(self):
@@ -52,6 +56,7 @@ class Record:
 
 class FormattedRecord:
     def __init__(self, record, rec_num=None):
+        """Class constructor."""
         self._rec = Record(record)
         self._rec_num = rec_num
         self.data = self.format()
@@ -63,6 +68,7 @@ class FormattedRecord:
         return self.__str__()
 
     def format(self):
+        """Format record object."""
         message = f"""<pre>Record #{self._rec_num}
                       Date: {self._rec.date()}
                       Notifier: {self._rec.notifier()}
@@ -78,4 +84,5 @@ class FormattedRecord:
         return inspect.cleandoc(message)
 
     def get_mirror_url(self):
+        """Get mirror URL."""
         return self._rec.mirror()

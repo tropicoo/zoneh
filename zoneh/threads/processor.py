@@ -18,6 +18,7 @@ class ProcessorThread(CommonThread):
     """Processor Thread Class."""
 
     def __init__(self, push_queue, temp_queue):
+        """Class constructor."""
         super().__init__()
         self._log = logging.getLogger(self.__class__.__name__)
         self._push_queue = push_queue
@@ -28,6 +29,7 @@ class ProcessorThread(CommonThread):
         self._rescan_period = CONF['zoneh']['rescan_period']
 
     def _run(self):
+        """Real thread run method."""
         while self._run_trigger.is_set():
             try:
                 self._pull_records()
@@ -40,18 +42,21 @@ class ProcessorThread(CommonThread):
             self._take_a_nap()
 
     def _pull_records(self):
+        """Pull records."""
         for record in self._scraper.get_archive(type_=self._arch_type):
             if not self._run_trigger.is_set() or record in self._temp_queue:
                 break
             self._process_record(record)
 
     def _process_record(self, record):
+        """Process pulled record."""
         self._log.debug(json.dumps(record))
         self._temp_queue.appendleft(record)
-        if self._filter.satisfy(record):
+        if self._filter.match(record):
             self._push_queue.appendleft(record)
 
     def _take_a_nap(self):
+        """Thread sleep."""
         time_delta = int(time.time()) + self._rescan_period
         while int(time.time()) < time_delta:
             if not self._run_trigger.is_set():

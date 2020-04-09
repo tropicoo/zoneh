@@ -32,4 +32,5 @@ _CONF = _load_config()
 
 
 def get_config():
+    """Return config as singleton."""
     return _CONF

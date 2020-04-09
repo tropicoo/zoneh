@@ -14,6 +14,7 @@ class _HTTPMethods:
     __slots__ = ('GET', 'POST', 'PUT', 'PATCH', 'DELETE')
 
     def __init__(self):
+        """Class constructor."""
         for method in self.__slots__:
             setattr(self, method, method)
 

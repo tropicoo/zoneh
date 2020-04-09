@@ -8,9 +8,9 @@ import zoneh.exceptions as exc
 from zoneh.captcha import captcha
 from zoneh.clients.zoneh import ZoneHAPI
 from zoneh.conf import get_config
+from zoneh.managers.captcha import captcha_manager
 from zoneh.parsers.htmlparser import HTMLParser
 from zoneh.utils import shallow_sleep, sleep_time, get_lock
-from zoneh.captcha import captcha_manager
 
 _log = logging.getLogger(__name__)
 _CONF = get_config()
@@ -26,6 +26,7 @@ class Scraper:
         self._lock = get_lock()
 
     def get_archive(self, type_, start=None):
+        """Get archive from Zone-H by given archive type."""
         domains = _CONF['zoneh']['filters']['domains']
         self._api.init_cookies()
         page_queue = deque([start or const.START_PAGE])
@@ -60,5 +61,6 @@ class Scraper:
             shallow_sleep(sleep_time())
 
     def _get_advanced_data(self, mirror_id):
+        """Get advanced data from Zone-H mirror page."""
         text = self._api.get_mirror_page(mirror_id)
         return self._parser.get_advanced_data(text)

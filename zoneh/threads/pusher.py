@@ -17,13 +17,15 @@ class PusherThread(CommonThread):
     """Pusher Thread Class."""
 
     def __init__(self, push_queue, update):
+        """Class constructor."""
         super().__init__()
         self._log = logging.getLogger(self.__class__.__name__)
         self._update = update
         self._lock = get_lock()
         self._push_queue = push_queue
 
-    def _run(self, ):
+    def _run(self):
+        """Real thread run method."""
         rec_num = 0
         while self._run_trigger.is_set():
             with self._lock:
@@ -44,11 +46,13 @@ class PusherThread(CommonThread):
             shallow_sleep(1)
 
     def _send_captcha(self, update):
+        """Send captcha image to the telegram chat."""
         self._log.info('Sending captcha image to telegram')
         update.message.reply_photo(photo=captcha.image, caption=captcha.caption)
         captcha.is_sent = True
 
     def _process_record(self, record, rec_num):
+        """Process and send record."""
         rec_formatted = FormattedRecord(record, rec_num)
         keyboard = [[InlineKeyboardButton(
             'Open mirror', url=rec_formatted.get_mirror_url())]]

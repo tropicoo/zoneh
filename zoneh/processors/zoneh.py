@@ -11,6 +11,7 @@ CONF = get_config()
 
 class Processor:
     def __init__(self):
+        """Class constructor."""
         self._log = logging.getLogger(self.__class__.__name__)
         self.push_queue = deque()
         self.temp_queue = deque(maxlen=10000)

@@ -25,6 +25,10 @@ def authorization_check(func):
 
 
 def lock(func):
+    """Thread locking decorator.
+
+    Caution: can create deadlock.
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
         with _lock:
@@ -34,6 +38,7 @@ def lock(func):
 
 
 def _content_handler_helper(parser, page):
+    """Helper function to verify the fetched content."""
     if parser.is_captcha(page):
         warn_msg = 'Captcha request'
         parser._log.warning(warn_msg)

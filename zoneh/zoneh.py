@@ -7,9 +7,10 @@ from telegram import Bot
 from telegram.utils.request import Request
 
 import zoneh.exceptions as exc
-from zoneh.captcha import captcha_manager, captcha
+from zoneh.captcha import captcha
 from zoneh.conf import get_config
 from zoneh.decorators import authorization_check
+from zoneh.managers.captcha import captcha_manager
 from zoneh.managers.thread import ThreadManager
 from zoneh.processors.csv import CsvProcessor
 from zoneh.processors.zoneh import Processor
@@ -24,6 +25,7 @@ class ZoneHBot(Bot):
     """Class where main bot things are done."""
 
     def __init__(self, stop_polling):
+        """Class constructor."""
         token = _CONF['telegram']['token']
         super().__init__(token, request=(Request(con_pool_size=10)))
         self._log = logging.getLogger(self.__class__.__name__)
@@ -31,7 +33,6 @@ class ZoneHBot(Bot):
         self._stop_polling = stop_polling
         self._log.info('Initializing %s bot', self.first_name)
 
-        self._captcha_queue = captcha_manager.get_queue()
         self._pusher_on = Event()
         self._processor = Processor()
         self._lock = get_lock()
@@ -99,6 +100,7 @@ class ZoneHBot(Bot):
                            filename='records.csv')
 
     def _start_threads(self, update):
+        """Start core threads during bot start"""
         proc_thread = ProcessorThread(self._processor.push_queue,
                                       self._processor.temp_queue)
         pusher_thread = PusherThread(self._processor.push_queue, update)
@@ -107,13 +109,15 @@ class ZoneHBot(Bot):
 
     @authorization_check
     def solve_captcha(self, update):
+        """Solve captcha."""
         if not captcha.is_active:
             self._log.warning('Captcha inactive, skip solving')
             return
 
         self._log.info('Solving captcha')
         is_solved = captcha_manager.solve_captcha(update.message.text)
-        update.message.reply_text('Captcha solved' if is_solved else 'Try again')
+        update.message.reply_text(
+            'Captcha solved' if is_solved else 'Try again')
 
     def error_handler(self, update, error):
         """Handle known telegram bot API errors."""

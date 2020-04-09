@@ -18,6 +18,7 @@ class ZBotLauncher:
     """Bot launcher."""
 
     def __init__(self):
+        """Class constructor."""
         self._log = logging.getLogger(self.__class__.__name__)
 
         log_level = self._get_int_log_level(_CONF['log_level'])

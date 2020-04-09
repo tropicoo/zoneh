@@ -13,6 +13,7 @@ from zoneh.utils import SingletonMeta
 
 class Soup(BeautifulSoup):
     def __init__(self, page):
+        """Class constructor."""
         super().__init__(page, 'html.parser')
 
 
@@ -65,6 +66,7 @@ class ColumnParser:
 
 class MirrorPageParser:
     def __init__(self, page):
+        """Class constructor."""
         self._log = logging.getLogger(self.__class__.__name__)
         self._soup = Soup(page)
         self._elems = self._soup.find_all('li', {'class': const.MIRROR_LI_CLASS})
@@ -117,6 +119,7 @@ class MirrorPageParser:
 
 class HTMLParser(metaclass=SingletonMeta):
     def __init__(self):
+        """Class constructor."""
         self._log = logging.getLogger(self.__class__.__name__)
         self._rev_map = {v: getattr(ColumnParser, k) for k, v in const.TBL_MAP.items()}
 

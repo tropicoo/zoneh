@@ -28,24 +28,24 @@ class SingletonMeta(type):
 
 
 def shallow_sleep(seconds=1):
+    """Basic sleep function."""
     time.sleep(seconds)
 
 
-def create_csv_obj(data):
-    pass
-
-
 def make_bold(text):
+    """Make text bold before sending to the telegram chat."""
     return f'<b>{text}</b>'
 
 
 def get_func_name():
+    """Get function name."""
     curframe = inspect.currentframe()
     calframe = inspect.getouterframes(curframe, 2)
     return calframe[1][3]
 
 
 def get_captcha_number():
+    """Get random number for captcha URL."""
     return secrets.choice(range(1, 1001))
 
 
@@ -57,12 +57,15 @@ def sleep_time():
 
 
 def is_generator(func):
+    """Check whether object is generator."""
     return inspect.isgeneratorfunction(func)
 
 
 def get_randoma_ua():
+    """Get random User-Agent."""
     return _UA.random
 
 
 def get_lock():
+    """Get thread lock."""
     return _LOCK
