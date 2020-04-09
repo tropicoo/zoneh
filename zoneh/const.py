@@ -9,6 +9,17 @@ _CONF = get_config()
 
 LOG_LEVELS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
 
+
+class _HTTPMethods:
+    __slots__ = ('GET', 'POST', 'PUT', 'PATCH', 'DELETE')
+
+    def __init__(self):
+        for method in self.__slots__:
+            setattr(self, method, method)
+
+
+Http = _HTTPMethods()
+
 HOST = 'www.zone-h.org'
 BASE_URL = f'https://{HOST}'
 
@@ -62,8 +73,7 @@ MIRROR_PAGE_MAP = {
                    'ip_and_country': _M_DEFACET},
     'metadata_2': {'index': 2,
                    'os': _M_DEFACEF,
-                   'server': _M_DEFACES,
-                   }}
+                   'server': _M_DEFACES}}
 
 START_PAGE = 1
 
@@ -82,5 +92,4 @@ HEADERS = {'Host': HOST,
            'Accept-Encoding': 'gzip, deflate',
            'Accept-Language': 'en-US,en;q=0.9'}
 
-TMP_DIR = '{0}\\'.format(os.getenv('Temp')) \
-    if sys.platform == 'win32' else '/tmp/'
+TMP_DIR = f'{os.getenv("Temp")}\\' if sys.platform == 'win32' else '/tmp/'

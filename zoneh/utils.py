@@ -8,13 +8,27 @@ from threading import Lock
 
 from fake_useragent import UserAgent
 
-_LOG = logging.getLogger(__name__)
-_UA = UserAgent(cache=False)
+_log = logging.getLogger(__name__)
+_UA = UserAgent(cache=True)
 _LOCK = Lock()
 
 
-def shallow_sleep(secs):
-    time.sleep(secs)
+class SingletonMeta(type):
+    """SingletonMeta class."""
+
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        """Check whether instance already exists.
+
+        Return existing or create new instance and save to dict."""
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+def shallow_sleep(seconds=1):
+    time.sleep(seconds)
 
 
 def create_csv_obj(data):
@@ -25,7 +39,7 @@ def make_bold(text):
     return f'<b>{text}</b>'
 
 
-def get_fn_name():
+def get_func_name():
     curframe = inspect.currentframe()
     calframe = inspect.getouterframes(curframe, 2)
     return calframe[1][3]
@@ -36,11 +50,10 @@ def get_captcha_number():
 
 
 def sleep_time():
+    """Lowering the values increases the risk of getting perm banned
+    by Zone-H's anti-DDoS logic.
     """
-    Lowering the values increases the risk of getting perm banned by Zone-H's
-    anti-DDoS logic.
-    """
-    return secrets.choice(range(4, 7))
+    return secrets.choice(range(7, 12))
 
 
 def is_generator(func):

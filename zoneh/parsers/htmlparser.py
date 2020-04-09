@@ -3,54 +3,17 @@
 import logging
 import re
 from collections import OrderedDict
-from functools import wraps
 
 from bs4 import BeautifulSoup
 
 import zoneh.const as const
-import zoneh.exceptions
-from zoneh.utils import is_generator
-
-_LOG = logging.getLogger(__name__)
-
-
-def _content_handler_helper(parser, page):
-    if parser.is_captcha(page):
-        err_msg = 'Captcha request'
-        _LOG.error(err_msg)
-        raise zoneh.exceptions.HTMLParserCaptchaRequest(err_msg)
-    elif parser.is_prelogin(page):
-        err_msg = 'Need to set cookies'
-        _LOG.error(err_msg)
-        raise zoneh.exceptions.HTMLParserCookiesError(err_msg)
-    else:
-        err_msg = 'Couldn\'t find HTML element. Check logs'
-        _LOG.exception(err_msg)
-        raise zoneh.exceptions.HTMLParserError(err_msg)
-
-
-def content_handler(func):
-    """HTML content handler decorator."""
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        parser, page = args
-
-        def iter_func():
-            try:
-                yield from func(*args, **kwargs)
-            except Exception:
-                _content_handler_helper(parser, page)
-        try:
-            return iter_func() if is_generator(func) else func(*args, **kwargs)
-        except Exception:
-            _content_handler_helper(parser, page)
-    return wrapper
+from zoneh.decorators import content_handler
+from zoneh.utils import SingletonMeta
 
 
 class Soup(BeautifulSoup):
     def __init__(self, page):
-        super(Soup, self).__init__(page, 'html.parser')
+        super().__init__(page, 'html.parser')
 
 
 class ColumnParser:
@@ -102,6 +65,7 @@ class ColumnParser:
 
 class MirrorPageParser:
     def __init__(self, page):
+        self._log = logging.getLogger(self.__class__.__name__)
         self._soup = Soup(page)
         self._elems = self._soup.find_all('li', {'class': const.MIRROR_LI_CLASS})
 
@@ -122,39 +86,46 @@ class MirrorPageParser:
         text = self._elems[const.MIRROR_PAGE_MAP['date']['index']].text
         return text.split(' ', 3)[-1]
 
-    def _get_notifier(self, inner):
+    @staticmethod
+    def _get_notifier(inner):
         _class = const.MIRROR_PAGE_MAP['metadata_1']['notifier']
         return inner.find('li', {'class': _class}).text.rsplit(' ', 1)[-1]
 
-    def _get_url(self, inner):
+    @staticmethod
+    def _get_url(inner):
         _class = const.MIRROR_PAGE_MAP['metadata_1']['defaced_url_full']
         return inner.find('li', {'class': _class}).text.rsplit(' ')[-1]
 
-    def _get_ip_and_country(self, inner):
+    @staticmethod
+    def _get_ip_and_country(inner):
         _class = const.MIRROR_PAGE_MAP['metadata_1']['ip_and_country']
         li = inner.find('li', {'class': _class})
         ip = li.text.rstrip().rsplit(' ', 1)[-1]
         country = li.img.get('title') if li.img else ''
         return ip, country
 
-    def _get_os(self, inner):
+    @staticmethod
+    def _get_os(inner):
         _class = const.MIRROR_PAGE_MAP['metadata_2']['os']
         return inner.find('li', {'class': _class}).text.split(' ')[-1]
 
-    def _get_server(self, inner):
+    @staticmethod
+    def _get_server(inner):
         _class = const.MIRROR_PAGE_MAP['metadata_2']['server']
         return inner.find('li', {'class': _class}).text.split(' ')[-1]
 
 
-class HTMLParser:
+class HTMLParser(metaclass=SingletonMeta):
     def __init__(self):
+        self._log = logging.getLogger(self.__class__.__name__)
         self._rev_map = {v: getattr(ColumnParser, k) for k, v in const.TBL_MAP.items()}
 
-    def parse_cookies(self, page):
+    @staticmethod
+    def parse_cookies(page):
         cookies = {}
         soup = Soup(page)
 
-        js_script = soup.find_all('script')[-1].text
+        js_script = soup.find_all('script')[-1].string
         if not js_script:
             # TODO
             pass
@@ -187,18 +158,23 @@ class HTMLParser:
                     self._rev_map[index](col)
             yield record, next_page
 
-    def get_advanced_data(self, page):
+    @staticmethod
+    def get_advanced_data(page):
         return MirrorPageParser(page).get_mirror_data()
 
-    def get_next_page(self, table):
+    @staticmethod
+    def get_next_page(table):
         row = table.find_all('tr')[const.TBL_PAGE_NUMS_ROW_ID]
         col = row.find('td')
         next_page = col.find('strong').find_next_sibling('a')
         return int(next_page.text) if next_page else None
 
     def is_captcha(self, page):
+        self._log.debug('Parsing page for captcha')
+        self._log.debug(page)
         page = Soup(page)
         return bool(page.find('img', attrs={'id': const.CAPTCHA_ID}))
 
-    def is_prelogin(self, page):
+    @staticmethod
+    def is_prelogin(page):
         return const.PRELOGIN_CONDITION in page

@@ -9,6 +9,8 @@ _CONF = get_config()
 
 
 class Filter:
+    """Data filter class."""
+
     def __init__(self):
         countries = _CONF['zoneh']['filters']['countries']
         self._countries = [COUNTRY_DICT[x] for x in countries]
@@ -26,7 +28,7 @@ class Filter:
         defaced_url = record['defaced_url']
         defaced_domain = urlsplit(defaced_url).netloc
         if not defaced_domain:
-            defaced_url = 'http://{0}'.format(defaced_url)
+            defaced_url = f'http://{defaced_url}'
             defaced_domain = urlsplit(defaced_url).netloc
         for domain in self._domains:
             if defaced_domain.endswith(domain):

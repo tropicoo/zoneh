@@ -16,7 +16,7 @@ Make sure you have Python >= 3.6
 
 ```
 git clone https://github.com/tropicoo/zoneh.git
-pip3 install python-telegram-bot requests beautifulsoup4 js2py fake-useragent
+pip3 install -r requirements.txt
 ```
 
 Configuration

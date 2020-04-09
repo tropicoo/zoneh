@@ -11,6 +11,8 @@ from zoneh.zoneh import ZoneHBot
 
 _CONF = get_config()
 
+__version__ = '0.2'
+
 
 class ZBotLauncher:
     """Bot launcher."""
@@ -21,22 +23,23 @@ class ZBotLauncher:
         log_level = self._get_int_log_level(_CONF['log_level'])
         logging.getLogger().setLevel(log_level)
 
-        zbot = ZoneHBot(stop_polling=self._stop_polling)
-
-        self._updater = Updater(bot=zbot)
+        self._bot = ZoneHBot(stop_polling=self._stop_polling)
+        self._updater = Updater(bot=self._bot)
         self._welcome_sent = False
         self._setup_commands()
 
     def run(self):
         """Run bot."""
-        self._log.info('Starting {0} bot'.format(self._updater.bot.first_name))
-
-        if not self._welcome_sent:
-            self._updater.bot.send_startup_message()
-            self._welcome_sent = True
-
+        self._log.info('Starting %s bot', self._updater.bot.first_name)
+        self._send_welcome_message()
         self._updater.start_polling()
         self._updater.idle()
+
+    def _send_welcome_message(self):
+        """Send welcome message to the user."""
+        if not self._welcome_sent:
+            self._updater.bot.send_welcome_message()
+            self._welcome_sent = True
 
     def _stop_polling(self):
         """Stops bot and exits application."""
@@ -51,20 +54,21 @@ class ZBotLauncher:
         dispatcher.add_handler(CommandHandler('stop', ZoneHBot.cmd_stop))
         dispatcher.add_handler(CommandHandler('run', ZoneHBot.cmd_run))
         dispatcher.add_handler(CommandHandler('csv', ZoneHBot.make_csv))
-        dispatcher.add_handler(MessageHandler(Filters.text, ZoneHBot.solve_captcha))
+        dispatcher.add_handler(
+            MessageHandler(Filters.text, ZoneHBot.solve_captcha))
         dispatcher.add_error_handler(ZoneHBot.error_handler)
 
     def _get_int_log_level(self, log_level_str):
         if log_level_str not in const.LOG_LEVELS:
-            warn_msg = 'Invalid log level "{0}", using "INFO". ' \
-                       'Choose from {1})'.format(log_level_str, const.LOG_LEVELS)
+            warn_msg = f'Invalid log level "{log_level_str}", using "INFO". ' \
+                       f'Choose from {const.LOG_LEVELS})'
             self._log.warning(warn_msg)
         return getattr(logging, log_level_str, logging.INFO)
 
 
 if __name__ == '__main__':
-    log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    log_format = '%(asctime)s - [%(levelname)s] - [%(name)s:%(lineno)d] - %(message)s'
     logging.basicConfig(format=log_format)
 
-    bot = ZBotLauncher()
-    bot.run()
+    zoneh = ZBotLauncher()
+    zoneh.run()

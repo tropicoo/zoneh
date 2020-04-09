@@ -36,3 +36,7 @@ class HTMLParserCaptchaRequest(HTMLParserError):
 
 class HTMLParserCookiesError(HTMLParserError):
     pass
+
+
+class CaptchaError(ZoneHError):
+    pass
