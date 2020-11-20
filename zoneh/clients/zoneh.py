@@ -15,13 +15,13 @@ from zoneh.const import (
 import zoneh.exceptions as exc
 from zoneh.conf import get_config
 from zoneh.parsers.htmlparser import HTMLParser
-from zoneh.utils import get_randoma_ua, get_captcha_number, SingletonMeta
+from zoneh.utils import get_random_ua, get_captcha_number, Singleton
 
 _CONF = get_config()
 
 
 class Cookies:
-    """Class to manage session cookies."""
+    """Class to manage Zone-H session cookies."""
 
     def __init__(self, api, session):
         """Class constructor."""
@@ -35,7 +35,8 @@ class Cookies:
         """Init cookies."""
         if force:
             self._purge_cookies()
-        if not self._session.cookies:
+            self._initialize_cookies()
+        elif not self._session.cookies:
             self._initialize_cookies()
 
     def _initialize_cookies(self):
@@ -93,7 +94,7 @@ class Cookies:
         return cookies
 
 
-class ZoneHAPI(metaclass=SingletonMeta):
+class ZoneHAPI(metaclass=Singleton):
     """Zone-H API class."""
 
     def __init__(self):
@@ -124,7 +125,7 @@ class ZoneHAPI(metaclass=SingletonMeta):
         return BytesIO(self._request(url).content)
 
     def solve_captcha(self, text, page):
-        """Solve captcha by posting captcha's text."""
+        """Solve captcha by posting captcha text."""
         self._log.info('Solving captcha with text "%s", page %s', text, page)
         self._log.debug('Cookies: %s', self._session.cookies.get_dict())
         url = ARCHIVE_TYPES[page[0]]['page'].format(page_num=page[1])
@@ -134,7 +135,7 @@ class ZoneHAPI(metaclass=SingletonMeta):
     def _request(self, url, method=Http.GET, data=None):
         """General request method."""
         self._log.debug('%s: %s %s', method, url, data)
-        self._update_headers()
+        self._randomize_ua_header()
         try:
             res = self._session.request(method, url=url, data=data)
             self._verify_result(res)
@@ -147,12 +148,13 @@ class ZoneHAPI(metaclass=SingletonMeta):
     @staticmethod
     def _verify_result(result):
         """Verify `requests` result."""
+        # TODO: verify result.
         return result
 
-    def _update_headers(self):
+    def _randomize_ua_header(self):
         """Update headers with random User-Agent before API call."""
         if self._random_ua:
             headers = HEADERS
-            headers['User-Agent'] = get_randoma_ua()
+            headers['User-Agent'] = get_random_ua()
             self._log.debug('Random UA: %s', headers['User-Agent'])
             self._session.headers.update(headers)

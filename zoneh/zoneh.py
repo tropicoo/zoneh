@@ -1,7 +1,7 @@
 """Zone-H module."""
 
 import logging
-from threading import Thread, Event
+from threading import Event, Thread
 
 from telegram import Bot
 from telegram.utils.request import Request
@@ -13,7 +13,7 @@ from zoneh.decorators import authorization_check
 from zoneh.managers.captcha import captcha_manager
 from zoneh.managers.thread import ThreadManager
 from zoneh.processors.csv import CsvProcessor
-from zoneh.processors.zoneh import Processor
+from zoneh.processors.zoneh import ZonehProcessor
 from zoneh.threads.processor import ProcessorThread
 from zoneh.threads.pusher import PusherThread
 from zoneh.utils import get_lock
@@ -34,7 +34,7 @@ class ZoneHBot(Bot):
         self._log.info('Initializing %s bot', self.first_name)
 
         self._pusher_on = Event()
-        self._processor = Processor()
+        self._processor = ZonehProcessor()
         self._lock = get_lock()
         self._thread_manager = ThreadManager([])
 

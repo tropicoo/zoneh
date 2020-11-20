@@ -4,15 +4,13 @@ import logging
 from collections import deque
 from threading import Event
 
-from zoneh.conf import get_config
-
-CONF = get_config()
+from zoneh.const import MAX_DEQUE_ITEMS
 
 
-class Processor:
+class ZonehProcessor:
     def __init__(self):
         """Class constructor."""
         self._log = logging.getLogger(self.__class__.__name__)
         self.push_queue = deque()
-        self.temp_queue = deque(maxlen=10000)
+        self.temp_queue = deque(maxlen=MAX_DEQUE_ITEMS)
         self._processor_on = Event()

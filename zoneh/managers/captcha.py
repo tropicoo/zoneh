@@ -6,10 +6,10 @@ from zoneh.captcha import captcha
 from zoneh.clients.zoneh import ZoneHAPI
 from zoneh.decorators import lock
 from zoneh.parsers.htmlparser import HTMLParser
-from zoneh.utils import SingletonMeta
+from zoneh.utils import Singleton
 
 
-class CaptchaManager(metaclass=SingletonMeta):
+class CaptchaManager(metaclass=Singleton):
     """Captcha manager class."""
 
     def __init__(self, captcha_):

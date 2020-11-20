@@ -6,12 +6,15 @@ from collections import OrderedDict
 
 from bs4 import BeautifulSoup
 
-import zoneh.const as const
+from zoneh.const import (
+    CAPTCHA_ID, COOKIES_JS_REGEX, MIRROR_LI_CLASS, MIRROR_PAGE_MAP,
+    PRELOGIN_CONDITION, TBL_ID, TBL_MAP, TBL_PAGE_NUMS_ROW_ID, TBL_SKIP_ROWS
+)
 from zoneh.decorators import content_handler
-from zoneh.utils import SingletonMeta
+from zoneh.utils import Singleton
 
 
-class Soup(BeautifulSoup):
+class HtmlSoup(BeautifulSoup):
     def __init__(self, page):
         """Class constructor."""
         super().__init__(page, 'html.parser')
@@ -68,13 +71,13 @@ class MirrorPageParser:
     def __init__(self, page):
         """Class constructor."""
         self._log = logging.getLogger(self.__class__.__name__)
-        self._soup = Soup(page)
-        self._elems = self._soup.find_all('li', {'class': const.MIRROR_LI_CLASS})
+        self._soup = HtmlSoup(page)
+        self._elems = self._soup.find_all('li', {'class': MIRROR_LI_CLASS})
 
     def get_mirror_data(self):
         data = {}
-        inner_1 = self._elems[const.MIRROR_PAGE_MAP['metadata_1']['index']]
-        inner_2 = self._elems[const.MIRROR_PAGE_MAP['metadata_2']['index']]
+        inner_1 = self._elems[MIRROR_PAGE_MAP['metadata_1']['index']]
+        inner_2 = self._elems[MIRROR_PAGE_MAP['metadata_2']['index']]
 
         data['date'] = self._get_date()
         data['notifier'] = self._get_notifier(inner_1)
@@ -85,22 +88,22 @@ class MirrorPageParser:
         return data
 
     def _get_date(self):
-        text = self._elems[const.MIRROR_PAGE_MAP['date']['index']].text
+        text = self._elems[MIRROR_PAGE_MAP['date']['index']].text
         return text.split(' ', 3)[-1]
 
     @staticmethod
     def _get_notifier(inner):
-        _class = const.MIRROR_PAGE_MAP['metadata_1']['notifier']
+        _class = MIRROR_PAGE_MAP['metadata_1']['notifier']
         return inner.find('li', {'class': _class}).text.rsplit(' ', 1)[-1]
 
     @staticmethod
     def _get_url(inner):
-        _class = const.MIRROR_PAGE_MAP['metadata_1']['defaced_url_full']
+        _class = MIRROR_PAGE_MAP['metadata_1']['defaced_url_full']
         return inner.find('li', {'class': _class}).text.rsplit(' ')[-1]
 
     @staticmethod
     def _get_ip_and_country(inner):
-        _class = const.MIRROR_PAGE_MAP['metadata_1']['ip_and_country']
+        _class = MIRROR_PAGE_MAP['metadata_1']['ip_and_country']
         li = inner.find('li', {'class': _class})
         ip = li.text.rstrip().rsplit(' ', 1)[-1]
         country = li.img.get('title') if li.img else ''
@@ -108,32 +111,33 @@ class MirrorPageParser:
 
     @staticmethod
     def _get_os(inner):
-        _class = const.MIRROR_PAGE_MAP['metadata_2']['os']
+        _class = MIRROR_PAGE_MAP['metadata_2']['os']
         return inner.find('li', {'class': _class}).text.split(' ')[-1]
 
     @staticmethod
     def _get_server(inner):
-        _class = const.MIRROR_PAGE_MAP['metadata_2']['server']
+        _class = MIRROR_PAGE_MAP['metadata_2']['server']
         return inner.find('li', {'class': _class}).text.split(' ')[-1]
 
 
-class HTMLParser(metaclass=SingletonMeta):
+class HTMLParser(metaclass=Singleton):
     def __init__(self):
         """Class constructor."""
         self._log = logging.getLogger(self.__class__.__name__)
-        self._rev_map = {v: getattr(ColumnParser, k) for k, v in const.TBL_MAP.items()}
+        self._rev_map = {v: getattr(ColumnParser, k) for k, v in
+                         TBL_MAP.items()}
 
     @staticmethod
     def parse_cookies(page):
         cookies = {}
-        soup = Soup(page)
+        soup = HtmlSoup(page)
 
         js_script = soup.find_all('script')[-1].string
         if not js_script:
             # TODO
             pass
 
-        match = re.match(const.COOKIES_JS_REGEX, js_script, re.MULTILINE)
+        match = re.match(COOKIES_JS_REGEX, js_script, re.MULTILINE)
         if not match:
             # TODO
             pass
@@ -147,11 +151,11 @@ class HTMLParser(metaclass=SingletonMeta):
 
     @content_handler
     def get_records(self, page):
-        soup = Soup(page)
-        table = soup.find('table', attrs={'id': const.TBL_ID})
+        soup = HtmlSoup(page)
+        table = soup.find('table', attrs={'id': TBL_ID})
         next_page = self.get_next_page(table)
         rows = table.find_all('tr')
-        start_slice, end_slice = const.TBL_SKIP_ROWS
+        start_slice, end_slice = TBL_SKIP_ROWS
 
         for row in rows[start_slice:end_slice]:
             record = OrderedDict()
@@ -167,17 +171,17 @@ class HTMLParser(metaclass=SingletonMeta):
 
     @staticmethod
     def get_next_page(table):
-        row = table.find_all('tr')[const.TBL_PAGE_NUMS_ROW_ID]
+        row = table.find_all('tr')[TBL_PAGE_NUMS_ROW_ID]
         col = row.find('td')
         next_page = col.find('strong').find_next_sibling('a')
         return int(next_page.text) if next_page else None
 
     def is_captcha(self, page):
         self._log.debug('Parsing page for captcha')
-        self._log.debug(page)
-        page = Soup(page)
-        return bool(page.find('img', attrs={'id': const.CAPTCHA_ID}))
+        # self._log.debug(page)
+        page = HtmlSoup(page)
+        return bool(page.find('img', attrs={'id': CAPTCHA_ID}))
 
     @staticmethod
     def is_prelogin(page):
-        return const.PRELOGIN_CONDITION in page
+        return PRELOGIN_CONDITION in page

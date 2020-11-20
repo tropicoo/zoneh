@@ -4,10 +4,9 @@ import json
 import logging
 import time
 
-import zoneh.exceptions as exc
 from zoneh.commons import CommonThread
 from zoneh.conf import get_config
-from zoneh.filters.zoneh import Filter
+from zoneh.filters.engine import FilterEngine
 from zoneh.scraper import Scraper
 from zoneh.utils import shallow_sleep
 
@@ -24,7 +23,7 @@ class ProcessorThread(CommonThread):
         self._push_queue = push_queue
         self._temp_queue = temp_queue
         self._scraper = Scraper()
-        self._filter = Filter()
+        self._filter = FilterEngine()
         self._arch_type = CONF['zoneh']['archive']
         self._rescan_period = CONF['zoneh']['rescan_period']
 
@@ -33,12 +32,12 @@ class ProcessorThread(CommonThread):
         while self._run_trigger.is_set():
             try:
                 self._pull_records()
-            except Exception as err:
+            except Exception:
                 err_msg = 'Processor thread received error ' \
                           'during handling scrape records'
                 self._log.exception(err_msg)
-                raise exc.ProcessorError(err)
-
+                shallow_sleep(2)
+                continue
             self._take_a_nap()
 
     def _pull_records(self):

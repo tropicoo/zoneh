@@ -4,18 +4,18 @@ import logging
 
 from zoneh.conf import get_config
 from zoneh.exceptions import CaptchaError
-from zoneh.utils import SingletonMeta
+from zoneh.utils import Singleton
 
 _CONF = get_config()
 
 
-class Captcha(metaclass=SingletonMeta):
+class Captcha(metaclass=Singleton):
     """Shared object representing real captcha."""
 
     def __init__(self):
         """Class constructor."""
         self._log = logging.getLogger(self.__class__.__name__)
-        self.caption = 'Captcha request'
+        self.caption = 'Captcha request, please type what you see'
         self.err_msg = 'Try once more'
         self._image = None
         self._is_active = False

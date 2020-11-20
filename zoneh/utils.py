@@ -13,8 +13,8 @@ _UA = UserAgent(cache=True)
 _LOCK = Lock()
 
 
-class SingletonMeta(type):
-    """SingletonMeta class."""
+class Singleton(type):
+    """Singleton class."""
 
     _instances = {}
 
@@ -61,7 +61,7 @@ def is_generator(func):
     return inspect.isgeneratorfunction(func)
 
 
-def get_randoma_ua():
+def get_random_ua():
     """Get random User-Agent."""
     return _UA.random
 

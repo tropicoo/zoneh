@@ -7,7 +7,16 @@ from zoneh.conf import get_config
 
 _CONF = get_config()
 
-LOG_LEVELS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
+LOG_LEVELS = {'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'}
+
+MAX_DEQUE_ITEMS = 10000
+
+
+class FilterType:
+    """Filter types in plural as keys from config."""
+    COUNTRY = 'countries'
+    DOMAIN = 'domains'
+    NOTIFIER = 'notifiers'
 
 
 class _HTTPMethods:

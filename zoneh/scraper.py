@@ -3,14 +3,14 @@
 import logging
 from collections import deque
 
-import zoneh.const as const
 import zoneh.exceptions as exc
 from zoneh.captcha import captcha
 from zoneh.clients.zoneh import ZoneHAPI
 from zoneh.conf import get_config
+from zoneh.const import START_PAGE
 from zoneh.managers.captcha import captcha_manager
 from zoneh.parsers.htmlparser import HTMLParser
-from zoneh.utils import shallow_sleep, sleep_time, get_lock
+from zoneh.utils import get_lock, shallow_sleep, sleep_time
 
 _log = logging.getLogger(__name__)
 _CONF = get_config()
@@ -29,7 +29,7 @@ class Scraper:
         """Get archive from Zone-H by given archive type."""
         domains = _CONF['zoneh']['filters']['domains']
         self._api.init_cookies()
-        page_queue = deque([start or const.START_PAGE])
+        page_queue = deque([start or START_PAGE])
         while page_queue:
             page_num = page_queue.pop()
             html_page = self._api.get_page(page_num, type_)

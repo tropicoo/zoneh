@@ -55,7 +55,7 @@ class PusherThread(CommonThread):
         """Process and send record."""
         rec_formatted = FormattedRecord(record, rec_num)
         keyboard = [[InlineKeyboardButton(
-            'Open mirror', url=rec_formatted.get_mirror_url())]]
+            'Open mirror', url=rec_formatted.mirror)]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         self._update.message.reply_html(rec_formatted.data,
                                         reply_markup=reply_markup)

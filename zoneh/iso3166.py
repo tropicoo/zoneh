@@ -1,4 +1,4 @@
-"""Modified ISO 3166-1 alpha-2 country mapping."""
+"""Modified ISO 3166-1 alpha-2 country mapping for Zone-H filtering."""
 
 COUNTRY_DICT = {'AD': 'Andorra',
                 'AE': 'United Arab Emirates',
