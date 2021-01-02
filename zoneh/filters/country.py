@@ -18,4 +18,4 @@ class CountryFilter(BaseFilter, metaclass=FilterRegistry):
         self.is_empty = bool(self._countries)
 
     def match(self, record):
-        pass
+        return record['country'] in self._countries
