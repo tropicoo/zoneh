@@ -54,8 +54,8 @@ be used, just separate them with a comma.
 Write to the `archive` key.
 4. Write preferred filters to `filters` key:
     1. `countries`: [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
-    country codes, e.g `['FR', 'BR']` for France and Brazil.
-    2. `domains`: ending parts of domains e.g. `['.go.id']`
+    country codes, e.g `["FR", "BR"]` for France and Brazil.
+    2. `domains`: ending parts of domains e.g. `[".go.id"]`
     3. `notifiers`: watch for submissions of specific notifiers.
    
 5. Modify User-Agent headers written in `HEADERS` constant in `zoneh/const.py` if needed.
