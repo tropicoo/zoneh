@@ -2,4 +2,4 @@ beautifulsoup4==4.9.3
 fake-useragent==0.1.11
 js2py==0.70
 python-telegram-bot==12.8
-requests==2.31.0
+requests==2.32.0
